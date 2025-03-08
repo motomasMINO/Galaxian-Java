@@ -1,4 +1,4 @@
-# Galaxian - Java版
+# Galaxian Java版
 
 ナムコのクラシックなアーケードシューティングゲームのギャラクシアンをJavaで再現してみました。
 
