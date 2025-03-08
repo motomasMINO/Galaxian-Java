@@ -34,7 +34,7 @@
 
 ## 🛠️ 動作環境
 
-- **JDK 8 以上**
+- **JDK 23**
 - **Java Swing**
 - **Java Sound API**
 
