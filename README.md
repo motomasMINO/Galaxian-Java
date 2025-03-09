@@ -45,14 +45,14 @@
 
 2. **リポジトリをクローン(ダウンロード)**  
    ターミナルまたはコマンドプロンプトで以下のコマンドを実行：
-   
+   ```sh
    git clone https://github.com/motomasMINO/Galaxian-Java.git
    
    cd Galaxian-Java
 
 3. **コンパイル ＆ 実行**
 以下のコマンドを使用してゲームを起動:
-
+   ```sh
    javac App.java
 
    java App
