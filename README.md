@@ -50,12 +50,10 @@
    
    cd Galaxian-Java
 
-3. **コンパイル ＆ 実行**
+3. **アプリ起動**
 以下のコマンドを使用して起動:
    ```sh
-   javac App.java
-
-   java App
+   java -cp src App
 
 　　※起動するとすぐにゲームがスタートします。
 
