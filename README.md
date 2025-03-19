@@ -51,6 +51,7 @@
    cd Galaxian-Java
 
 3. **アプリ起動**
+
 以下のコマンドを使用して起動:
    ```sh
    java -cp src App
