@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>GALAXIAN</title>
+<style>
+  canvas { background: black; display: block; margin: 0 auto; }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas" width="512" height="512"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const tileSize = 32;
+const boardWidth = 16 * tileSize;
+const boardHeight = 16 * tileSize;
+
+class Block {
+    constructor(x, y, width, height, img=null, points=0) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.img = img;
+        this.alive = true;
+        this.used = false;
+        this.points = points;
+    }
+}
+
+// 画像読み込み
+const shipImg = new Image(); shipImg.src = "./images/Galacship.png";
+const alienRedImg = new Image(); alienRedImg.src = "./images/RedAlien.jpg";
+const alienCyanImg = new Image(); alienCyanImg.src = "./images/CyanAlien.jpg";
+const alienPinkImg = new Image(); alienPinkImg.src = "./images/PinkAlien.jpg";
+const fragShipImg = new Image(); fragShipImg.src = "./images/Fragship.png";
+
+// BGM/SE
+const bgm = new Audio("./sounds/backgroundMusic.wav");
+bgm.loop = true;
+bgm.volume = 0.5;
+
+const shoot = new Audio("./sounds/shoot.wav");
+shoot.volume = 0.5;
+
+const hitEnemy = new Audio("./sounds/HitEnemy.wav");
+hitEnemy.volume = 0.5;
+
+const hitBoss = new Audio("./sounds/HitBoss.wav");
+hitBoss.volume = 0.5;
+
+const explosion = new Audio("./sounds/FighterLoss.wav");
+explosion.volume = 0.5;
+
+const start = new Audio("./sounds/StartGame.wav");
+start.volume = 0.5;
+
+const ExtraLife = new Audio("./sounds/Extra-Life.wav");
+ExtraLife.volume = 0.5;
+
+// 自機
+const shipWidth = tileSize*2, shipHeight=tileSize;
+let ship = new Block(boardWidth/2 - tileSize, boardHeight - tileSize*2, shipWidth, shipHeight, shipImg);
+let shipVelocityX = 5;
+
+// 敵
+let alienRedArray = [], alienCyanArray = [], alienPinkArray = [], fragshipArray = [];
+let bulletArray = [], enemyBulletArray = [];
+
+let alienRedVelocityX=0.75, alienCyanVelocityX=0.75, alienPinkVelocityX=0.75, fragshipVelocityX=0.75;
+
+let score = 0, lives=3, rounds=1, gameOver=false;
+
+let nextExtraLifeScore = 10000; // 次の1UPスコア閾値
+
+// キーボード操作
+const keys = {};
+document.addEventListener('keydown', e => {
+    if (e.code === 'Space' && !e.repeat) {
+        if(gameOver){
+            // タイトル画面に戻る
+            window.location.href = "index.html";
+        } else {
+            // 弾丸発射処理
+            bulletArray.push(new Block(
+                ship.x + ship.width / 2,
+                ship.y,
+                tileSize / 8,
+                tileSize / 2
+            ));
+
+            // 発射音再生
+            shoot.currentTime = 0;
+            shoot.play()
+        }
+    }
+    keys[e.code] = true;
+});
+
+document.addEventListener('keyup', e => keys[e.code]=false);
+
+// 衝突判定
+function detectCollision(a,b){
+    return a.x < b.x+b.width &&
+           a.x+a.width > b.x &&
+           a.y < b.y+b.height &&
+           a.y+a.height > b.y;
+}
+
+
+
+// 敵作成
+function createEnemies(){
+    alienRedArray = []; alienCyanArray=[]; alienPinkArray=[]; fragshipArray=[];
+    for(let i=0;i<5;i++){
+        alienRedArray.push(new Block(70*i, 64, tileSize*2, tileSize, alienRedImg, 50)); // 赤 50点
+        alienCyanArray.push(new Block(70*i, 128, tileSize*2, tileSize, alienCyanImg, 40)); // シアン 40点
+        alienPinkArray.push(new Block(70*i, 96, tileSize*2, tileSize, alienPinkImg, 30)); // ピンク 30点
+        fragshipArray.push(new Block(70*i, 32, tileSize*2, tileSize, fragShipImg, 60)); // 旗艦 60点
+    }
+}
+
+// 描画
+function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(ship.alive && !gameOver) ctx.drawImage(ship.img, ship.x, ship.y, ship.width, ship.height);
+
+    [...alienRedArray,...alienCyanArray,...alienPinkArray,...fragshipArray].forEach(alien=>{
+        if(alien.alive) ctx.drawImage(alien.img, alien.x, alien.y, alien.width, alien.height);
+    });
+
+    ctx.fillStyle="yellow";
+    bulletArray.forEach(b=>{if(!b.used) ctx.fillRect(b.x,b.y,b.width,b.height)});
+    ctx.fillStyle="white";
+    enemyBulletArray.forEach(b=>ctx.fillRect(b.x,b.y,b.width,b.height));
+
+    ctx.fillStyle="white";
+    ctx.font="20px monospace";
+    ctx.fillText("SCORE:"+score, 10,20);
+    ctx.fillText("LIFE x "+lives, 10,500);
+    ctx.fillText("ROUND "+rounds, 430,500);
+
+    if(gameOver){
+        ctx.fillStyle="red";
+        ctx.font="30px monospace";
+        ctx.fillText("GAME OVER", 180, 250);
+    }
+}
+
+// ゲーム移動処理
+function move(){
+    // 自機操作
+    if(keys['ArrowLeft'] && ship.x > 0) ship.x -= shipVelocityX;
+    if(keys['ArrowRight'] && ship.x+ship.width < boardWidth) ship.x += shipVelocityX;
+
+    // 敵移動
+    alienRedArray.forEach(a=>{ if(a.alive){ a.x += alienRedVelocityX; if(a.x<0||a.x+a.width>boardWidth) alienRedVelocityX*=-1;} });
+    alienCyanArray.forEach(a=>{ if(a.alive){ a.x += alienCyanVelocityX; if(a.x<0||a.x+a.width>boardWidth) alienCyanVelocityX*=-1;} });
+    alienPinkArray.forEach(a=>{ if(a.alive){ a.x += alienPinkVelocityX; if(a.x<0||a.x+a.width>boardWidth) alienPinkVelocityX*=-1;} });
+    fragshipArray.forEach(a=>{ if(a.alive){ a.x += fragshipVelocityX; if(a.x<0||a.x+a.width>boardWidth) fragshipVelocityX*=-1;} });
+
+    // 自機弾丸移動
+    bulletArray.forEach(b=>b.y -= 10); // 自機弾発射速度
+    
+    // 敵弾丸移動
+    enemyBulletArray.forEach(b=>{
+        b.y += 4; // 敵弾発射速度
+
+        // 自機と敵弾の衝突判定
+        if(detectCollision(b,ship)){
+            lives--; 
+            ship.x=boardWidth/2-tileSize; 
+            ship.y=boardHeight-tileSize*2;
+            b.used=true; // 弾を消す
+
+            // 弾リセット
+            bulletArray = [];
+            enemyBulletArray = [];
+            
+            if(lives == 0) {
+               gameOver=true;
+               bgm.pause();
+               bgm.currentTime = 0;
+
+               fetch("http://localhost:8080/api/scores", {
+                   method: "POST",
+                   headers: { "Content-Type": "application/json" },
+                   body: JSON.stringify({ player: "Player1", score: score })
+               }).then(()=>console.log("Score submitted"));
+
+            }
+            // 効果音再生
+            explosion.currentTime = 0;
+            explosion.play();
+        }
+    });
+    enemyBulletArray = enemyBulletArray.filter(b => !b.used && b.y < boardHeight);
+
+    // 敵弾発射
+    [...alienRedArray, ...alienCyanArray, ...alienPinkArray, ...fragshipArray].forEach(enemy => {
+        if(enemy.alive && Math.random() < 0.01) { // 発射確率を調整
+            enemyBulletArray.push(new Block(
+                enemy.x + enemy.width/2 - 2, // 弾の幅2px
+                enemy.y + enemy.height,
+                4,
+                10
+            ));
+        }
+    });
+
+    // 自機弾丸と敵衝突
+    bulletArray.forEach(b=>{
+        [...alienRedArray,...alienCyanArray,...alienPinkArray,...fragshipArray].forEach(e=>{
+            if(!b.used && e.alive && detectCollision(b,e)){
+                b.used=true; // 弾を消す
+                e.alive=false;  // 敵を消す
+                score+=e.points; // スコア加算
+
+                // 1万点ごとに1UP
+                if (score >= nextExtraLifeScore) {
+                    lives++;
+                    ExtraLife.currentTime = 0;
+                    ExtraLife.play();
+                    nextExtraLifeScore += 10000; // 次の閾値を更新
+                }
+
+                // 効果音再生
+                let se;
+                if(fragshipArray.includes(e)){
+                    se = hitBoss.cloneNode();
+                } else {
+                    se = hitEnemy.cloneNode();
+                }
+                se.currentTime = 0;
+                se.play();
+            }
+        });
+    });
+
+    bulletArray = bulletArray.filter(b=>!b.used && b.y>0);
+
+    // 全敵を倒したら次ラウンド
+    if ([...alienRedArray, ...alienCyanArray, ...alienPinkArray, ...fragshipArray].every(e => !e.alive)) {
+        rounds++;
+
+        // 弾リセット
+        bulletArray = [];
+        enemyBulletArray = [];
+
+        createEnemies();
+    }
+}
+
+// ゲームループ
+function gameLoop(){
+    if(!gameOver){
+        move();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }else{
+        draw();
+    }
+}
+
+// 初期化
+createEnemies();
+
+gameLoop();
+
+start.currentTime = 0;
+start.play();
+
+bgm.currentTime = 0;
+bgm.play();
+</script>
+</body>
+</html>

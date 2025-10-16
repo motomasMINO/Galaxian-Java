@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>GALAXIAN</title>
+<style>
+  body {
+    color: white;
+    font-family: monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .container {
+    width: 512px;
+    height: 512px;
+    background: black;
+    border: 2px solid white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  h1 {
+    color: red;
+    font-size: 48px;
+    margin-bottom: 50px;
+  }
+  button {
+    display: block;
+    margin: 20px auto;
+    padding: 15px 40px;
+    font-size: 20px;
+    border-radius: 10px;
+    border: none;
+    background: #444;
+    color: white;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #666;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>WE ARE THE GALAXIANS</h1>
+    <button onclick="startGame()">GAME START</button>
+    <button onclick="viewScores()">HIGH SCORES</button>
+  </div>
+<script>
+function startGame(){
+  window.location.href = "game.html";
+}
+function viewScores(){
+  window.location.href = "scores.html";
+}
+</script>
+</body>
+</html>

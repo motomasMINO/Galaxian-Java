@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>GALAXIAN</title>
+<style>
+  body {
+    font-family: monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .container {
+    width: 512px;
+    height: 512px;
+    background: black;
+    border: 2px solid white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  h1 { 
+    color: white;
+    font-size: 36px; 
+    margin-bottom: 20px; }
+  table {
+    color: rgb(102, 179, 209);
+    margin: 0 auto;
+    border-collapse: collapse;
+    width: 50%;
+  }
+  th, td {
+    border: 1px solid white;
+    padding: 10px;
+  }
+  button {
+    margin-top: 40px;
+    padding: 15px 40px;
+    font-size: 20px;
+    border-radius: 10px;
+    border: none;
+    background: #444;
+    color: white;
+    cursor: pointer;
+  }
+  button:hover { background: #666; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>HIGH SCORES</h1>
+    <table id="scoreTable">
+    <thead>
+      <tr><th>Player</th><th>Score</th></tr>
+    </thead>
+    <tbody></tbody>
+    </table>
+    <button onclick="goBack()">BACK</button>
+  </div>
+<script>
+function goBack(){
+  window.location.href = "index.html";
+}
+
+fetch("http://localhost:8080/api/scores")
+  .then(res => res.json())
+  .then(data => {
+    const tbody = document.querySelector("#scoreTable tbody");
+    tbody.innerHTML = "";
+    data.forEach(s => {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${s.player}</td><td>${s.score}</td>`;
+      tbody.appendChild(row);
+    });
+  });
+</script>
+</body>
+</html>
