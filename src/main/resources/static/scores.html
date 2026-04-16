@@ -61,10 +61,12 @@
     <button onclick="goBack()">BACK</button>
   </div>
 <script>
+// 前の画面に戻る
 function goBack(){
   window.location.href = "index.html";
 }
 
+// スコアの取得と表示
 fetch("http://localhost:8080/api/scores")
   .then(res => res.json())
   .then(data => {

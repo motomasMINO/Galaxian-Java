@@ -9,14 +9,14 @@
 </head>
 <body>
 <canvas id="gameCanvas" width="512" height="512"></canvas>
-
 <script>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-const tileSize = 32;
-const boardWidth = 16 * tileSize;
-const boardHeight = 16 * tileSize;
+const canvas = document.getElementById("gameCanvas"); // ゲームキャンバスの取得
+const ctx = canvas.getContext("2d"); // 描画コンテキストの取得
+const tileSize = 32; // タイルサイズ
+const boardWidth = 16 * tileSize; // 512
+const boardHeight = 16 * tileSize; // 512
 
+// ブロッククラス
 class Block {
     constructor(x, y, width, height, img=null, points=0) {
         this.x = x;
@@ -179,12 +179,12 @@ function move(){
             bulletArray = [];
             enemyBulletArray = [];
             
-            if(lives == 0) {
+            if(lives == 0) { // ゲームオーバー処理
                gameOver=true;
                bgm.pause();
                bgm.currentTime = 0;
 
-               fetch("http://localhost:8080/api/scores", {
+               fetch("http://localhost:8080/api/scores", { // スコア送信
                    method: "POST",
                    headers: { "Content-Type": "application/json" },
                    body: JSON.stringify({ player: "Player1", score: score })
@@ -239,7 +239,7 @@ function move(){
         });
     });
 
-    bulletArray = bulletArray.filter(b=>!b.used && b.y>0);
+    bulletArray = bulletArray.filter(b=>!b.used && b.y>0); // 画面外の弾を消す
 
     // 全敵を倒したら次ラウンド
     if ([...alienRedArray, ...alienCyanArray, ...alienPinkArray, ...fragshipArray].every(e => !e.alive)) {

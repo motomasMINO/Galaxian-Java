@@ -1,32 +1,24 @@
 # Galaxian Java版
 
-<<<<<<< HEAD
-ナムコのシューティングゲーム「ギャラクシアン」をJava Swingを使用して作成してみました。
-=======
 ナムコのシューティングゲーム「ギャラクシアン」をSpring Bootを使用して再現してみました。
->>>>>>> 9c37c7f (Replace Swing app with Spring Boot version)
+
 
 ![タイトル](Screenshot1.JPG)
 
 ![ゲームプレイ](Screenshot2.JPG)
 
-<<<<<<< HEAD
-=======
 ![スコア](Screenshot3.JPG)
 
->>>>>>> 9c37c7f (Replace Swing app with Spring Boot version)
 ## 概要
 
 - **エイリアンの攻撃 & 連射可能の自機の弾丸システム**
 - **エイリアンをすべて倒すと次のラウンドへ**
 - **サウンドエフェクト & BGM**
-<<<<<<< HEAD
 - **1UPシステム(ボーナススコアでライフが1追加)**
 - **ゲームオーバー後にいずれかのキーを押すとリスタート**
-=======
 - **1UPシステム（ボーナススコアでライフが1追加）**
 - **ゲームオーバー後にスペースキーを押すとタイトル画面に戻ります。**
->>>>>>> 9c37c7f (Replace Swing app with Spring Boot version)
+- **スコア保存機能(プレイ終了後)**
 
 ## 🎮 操作方法
 
@@ -70,14 +62,8 @@
    ```
 
 3. **アプリ起動**
-<<<<<<< HEAD
 
-   以下のコマンドを使用して起動:
-   ```sh
-   java -cp src App
-   ```
-　　※起動するとすぐにゲームがスタートします。
-=======
+   以下のコマンドを使用して起動
    ```bash
    mvnw spring-boot:run
    ```
@@ -86,24 +72,15 @@
    ```arduino
    http://localhost:8080
    ```
->>>>>>> 9c37c7f (Replace Swing app with Spring Boot version)
 
 ## 📜 ライセンス
 
-<<<<<<< HEAD
-## 📧 お問い合わせ
-=======
 このプロジェクトはMIT Licenseのもとで公開されています。
->>>>>>> 9c37c7f (Replace Swing app with Spring Boot version)
 
 ## 📧 お問い合わせ
 
 - **Github: motomasMINO**
 
-<<<<<<< HEAD
-バグ報告や改善点・機能追加の提案はPull RequestまたはIssueで受け付けています！
-=======
 - **Email: yu120615@gmail.com**
 
   バグ報告や改善点・機能追加の提案はPull RequestまたはIssueで受け付けています!
->>>>>>> 9c37c7f (Replace Swing app with Spring Boot version)
